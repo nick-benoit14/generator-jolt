@@ -2,39 +2,40 @@
 const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const yosay = require('yosay');
+const path = require('path');
 
 module.exports = class extends Generator {
   prompting() {
-    // Have Yeoman greet the user.
-    this.log(yosay(
-      'Welcome to the delightful ' + chalk.red('generator-jlt-react') + ' generator!'
-    ));
+    this.log(yosay('Atomic ' + chalk.red('Test Generator')));
 
     const prompts = [{
-      type: 'confirm',
-      name: 'someAnswer',
-      message: 'Would you like to enable this option?',
-      default: true
-    }];
+      type: 'input',
+      name: 'componentName',
+      message: 'What is the name of your component?',
+      default: 'Component'
+    }, {
+      type: 'input',
+      name: 'componentFilePath',
+      message: 'What is the path to your component?',
+      default: './component'
+    }
+    ];
 
     return this.prompt(prompts).then(props => {
-      // To access props later use this.props.someAnswer;
       this.props = props;
+      Object.assign(this.options, props);
     });
   }
 
   writing() {
+    const fileName = path.parse(this.options.componentFilePath).base;
     this.fs.copyTpl(
       this.templatePath('test.ejs'),
-      this.destinationPath(`${this.options.componentFileName}.test.jsx`),
+      this.destinationPath(`${fileName}.test.jsx`),
       {
         componentName: this.options.componentName,
-        componentFileName: this.options.componentFileName
+        componentFilePath: this.options.componentFilePath
       }
     );
-  }
-
-  install() {
-    // this.installDependencies();
   }
 };
